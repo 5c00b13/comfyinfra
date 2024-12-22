@@ -63,14 +63,26 @@ export function NodeToolbar({ onAddNode }: NodeToolbarProps) {
         'scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent'
       )}>
         {templates.length > 0 ? (
-          templates.map((template) => (
-            <ServiceButton
-              key={template.id}
-              label={template.name}
-              iconUrl={template.icon}
-              onClick={() => onAddNode(template.type as ServiceType)}
-            />
-          ))
+          templates.map((template) => {
+            console.log('Template:', template);
+            
+            if (!template.type) {
+              console.error('Template missing type:', template);
+              return null;
+            }
+
+            return (
+              <ServiceButton
+                key={template.id}
+                label={template.name}
+                iconUrl={template.icon}
+                onClick={() => {
+                  console.log('Clicking template with type:', template.type);
+                  onAddNode(template.type as ServiceType);
+                }}
+              />
+            );
+          })
         ) : (
           <div className="text-gray-400 text-sm">
             {CONFIG.ERROR_MESSAGES.NO_TEMPLATES}
