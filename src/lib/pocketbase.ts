@@ -1,10 +1,8 @@
 import PocketBase from 'pocketbase';
 
-const DEFAULT_URL = 'http://pocketbase-x0ok4kwc80k80gkk8g48cco0.74.208.197.138.sslip.io';
-
 // Create PocketBase instance with fallback and error handling
 const createPocketBaseClient = () => {
-  const url = import.meta.env.VITE_POCKETBASE_URL || DEFAULT_URL;
+  const url = import.meta.env.VITE_POCKETBASE_URL;
   return new PocketBase(url);
 };
 
