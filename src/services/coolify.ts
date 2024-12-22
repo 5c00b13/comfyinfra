@@ -1,4 +1,3 @@
-
 export class CoolifyService {
   private baseUrl: string;
 
@@ -22,6 +21,26 @@ export class CoolifyService {
       return await response.json();
     } catch (error) {
       console.error('Coolify connection error:', error);
+      throw error;
+    }
+  }
+
+  async deleteNode(nodeId: string) {
+    try {
+      const response = await fetch(`${this.baseUrl}/nodes/${nodeId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete node');
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Node deletion error:', error);
       throw error;
     }
   }

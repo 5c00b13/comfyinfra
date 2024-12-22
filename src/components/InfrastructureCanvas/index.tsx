@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import ReactFlow, {
   Background,
   Controls,
@@ -40,6 +40,21 @@ export default function InfrastructureCanvas() {
     const newNode = createNode(type, position);
     setNodes((nds) => [...nds, newNode]);
   }, [setNodes]);
+
+  useEffect(() => {
+    const handleDeleteNode = (event: CustomEvent<{ nodeId: string }>) => {
+      const { nodeId } = event.detail;
+      setNodes((nodes) => nodes.filter((node) => node.id !== nodeId));
+      setEdges((edges) => edges.filter(
+        (edge) => edge.source !== nodeId && edge.target !== nodeId
+      ));
+    };
+
+    window.addEventListener('deleteNode', handleDeleteNode as EventListener);
+    return () => {
+      window.removeEventListener('deleteNode', handleDeleteNode as EventListener);
+    };
+  }, [setNodes, setEdges]);
 
   return (
     <div className="w-full h-screen bg-gray-900">
