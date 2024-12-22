@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import ReactFlow, {
   Background,
   Controls,
@@ -25,7 +25,7 @@ const defaultViewport = { x: 0, y: 0, zoom: 1 };
 export default function InfrastructureCanvas() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const { isListening, transcript, startListening } = useVoiceCommands();
+  const { isListening, startListening } = useVoiceCommands();
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
@@ -34,8 +34,8 @@ export default function InfrastructureCanvas() {
 
   const handleAddNode = useCallback((type: InfraNode['type']) => {
     const position = {
-      x: window.innerWidth / 3,
-      y: window.innerHeight / 3,
+      x: Math.random() * (window.innerWidth / 2) + 100,
+      y: Math.random() * (window.innerHeight / 2) + 100,
     };
     const newNode = createNode(type, position);
     setNodes((nds) => [...nds, newNode]);
