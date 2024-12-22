@@ -5,7 +5,7 @@ export class CoolifyService {
   private token: string | null = null;
 
   constructor() {
-    this.baseUrl = import.meta.env.VITE_COOLIFY_URL;
+    this.baseUrl = import.meta.env.VITE_COOLIFY_URL.replace(/\/+$/, '');
     this.email = import.meta.env.VITE_COOLIFY_EMAIL;
     this.password = import.meta.env.VITE_COOLIFY_PASSWORD;
   }
@@ -16,7 +16,10 @@ export class CoolifyService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Access-Control-Allow-Origin': '*',
         },
+        credentials: 'include',
         body: JSON.stringify({
           email: this.email,
           password: this.password,
@@ -24,14 +27,17 @@ export class CoolifyService {
       });
 
       if (!response.ok) {
-        throw new Error('Authentication failed');
+        throw new Error(`Authentication failed: ${response.statusText}`);
       }
 
       const data = await response.json();
       this.token = data.token;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Coolify authentication error:', error);
-      throw error;
+      if (error instanceof Error) {
+        throw new Error(`Authentication failed: ${error.message}`);
+      }
+      throw new Error('Authentication failed: Unknown error');
     }
   }
 
@@ -46,7 +52,10 @@ export class CoolifyService {
         headers: {
           'Authorization': `Bearer ${this.token}`,
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Access-Control-Allow-Origin': '*',
         },
+        credentials: 'include',
         body: JSON.stringify({
           nodeId,
           ...serviceConfig,
@@ -54,13 +63,16 @@ export class CoolifyService {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to deploy service');
+        throw new Error(`Deployment failed: ${response.statusText}`);
       }
 
       return await response.json();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Service deployment error:', error);
-      throw error;
+      if (error instanceof Error) {
+        throw new Error(`Deployment failed: ${error.message}`);
+      }
+      throw new Error('Deployment failed: Unknown error');
     }
   }
 
@@ -70,17 +82,23 @@ export class CoolifyService {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Access-Control-Allow-Origin': '*',
         },
+        credentials: 'include',
       });
       
       if (!response.ok) {
-        throw new Error('Failed to connect to Coolify');
+        throw new Error(`Connection test failed: ${response.statusText}`);
       }
       
       return await response.json();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Coolify connection error:', error);
-      throw error;
+      if (error instanceof Error) {
+        throw new Error(`Connection test failed: ${error.message}`);
+      }
+      throw new Error('Connection test failed: Unknown error');
     }
   }
 
