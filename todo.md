@@ -5,13 +5,12 @@ implement the following:
 - [ ] Add voice command interface for infrastructure creation
 - [ ] Implement LLM integration with Claude API
 - [ ] Create GitHub repository generation system
-- [ ] Build node template database with search
+- [x] Build node template database
 - [ ] Add node status monitoring and logging
 - [ ] Implement node compatibility validation
 - [ ] Create resource usage monitoring per node
-- [ ] Add dark mode styling
+- [x] Add dark mode styling
 - [ ] Build side panel for node configuration
 - [ ] Implement error handling and retry logic
-- [ ] Add node versioning system
 - [ ] Create unified log viewer
 - [ ] Set up resource limits per node
