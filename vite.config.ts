@@ -33,6 +33,15 @@ export default defineConfig(({ mode }) => {
             });
           },
         },
+        '/api/claude': {
+          target: 'https://api.anthropic.com',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/claude/, ''),
+          headers: {
+            'x-api-key': env.VITE_CLAUDE_API_KEY,
+            'anthropic-version': '2023-06-01'
+          }
+        }
       },
       cors: true // Enable CORS for development
     },
