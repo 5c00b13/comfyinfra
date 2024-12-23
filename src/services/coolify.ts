@@ -16,9 +16,9 @@ export class CoolifyService {
     try {
       console.log('Deploying service:', { nodeId, config: serviceConfig });
 
-      // Ensure the URL has the correct format with /api
+      // Ensure the URL has the correct format with /api/v1
       const baseUrl = this.baseUrl.replace(/\/+$/, ''); // Remove trailing slashes
-      const apiUrl = `${baseUrl}/api`;
+      const apiUrl = `${baseUrl}/api/v1`;
       
       // Log the request details
       console.log('Request details:', {
