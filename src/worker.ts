@@ -14,22 +14,35 @@ export default {
       });
     }
 
-    const anthropicUrl = 'https://api.anthropic.com/v1/messages';
+    try {
+      const body = await request.json();
+      
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': env.CLAUDE_API_KEY,
+          'anthropic-version': '2024-02-29'
+        },
+        body: JSON.stringify(body)
+      });
 
-    const modifiedRequest = new Request(anthropicUrl, {
-      method: request.method,
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': env.CLAUDE_API_KEY,
-        'anthropic-version': '2024-02-29',
-      },
-      body: request.body,
-    });
+      const data = await response.json();
 
-    const response = await fetch(modifiedRequest);
-    const newResponse = new Response(response.body, response);
-
-    newResponse.headers.set('Access-Control-Allow-Origin', '*');
-    return newResponse;
+      return new Response(JSON.stringify(data), {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        }
+      });
+    } catch (error: any) {
+      return new Response(JSON.stringify({ error: error.message || 'Unknown error' }), {
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        }
+      });
+    }
   },
 }; 
