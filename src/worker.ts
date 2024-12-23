@@ -14,7 +14,6 @@ export default {
       });
     }
 
-    const url = new URL(request.url);
     const anthropicUrl = 'https://api.anthropic.com/v1/messages';
 
     const modifiedRequest = new Request(anthropicUrl, {
