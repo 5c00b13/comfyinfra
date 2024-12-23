@@ -1,7 +1,7 @@
 implement the following:
 
 - [x] Node based canvas
-- [ ] Work on connecting this to coolify api for hosting
+- [x] Work on connecting this to coolify api for hosting
 - [ ] Add voice command interface for infrastructure creation
 - [ ] Implement LLM integration with Claude API
 - [ ] Create GitHub repository generation system
