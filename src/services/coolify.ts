@@ -5,11 +5,52 @@ export class CoolifyService {
   private token: string | null = null;
 
   constructor() {
-    this.baseUrl = import.meta.env.DEV ? '/api/coolify' : import.meta.env.VITE_COOLIFY_URL;
+    const coolifyUrl = import.meta.env.VITE_COOLIFY_URL;
+    if (!coolifyUrl) {
+      console.error('VITE_COOLIFY_URL is not set');
+    }
+    
+    this.baseUrl = import.meta.env.DEV ? '/api/coolify' : coolifyUrl;
     this.email = import.meta.env.VITE_COOLIFY_EMAIL;
     this.password = import.meta.env.VITE_COOLIFY_PASSWORD;
     
     console.log('CoolifyService initialized with baseUrl:', this.baseUrl);
+  }
+
+  private async handleResponse(response: Response, errorContext: string) {
+    const contentType = response.headers.get('content-type');
+    
+    if (!response.ok) {
+      // Handle non-200 responses
+      try {
+        if (contentType?.includes('application/json')) {
+          const errorData = await response.json();
+          throw new Error(`${errorContext}: ${errorData.message || response.statusText}`);
+        } else {
+          const text = await response.text();
+          console.error('Non-JSON error response:', text);
+          throw new Error(`${errorContext}: ${response.statusText}`);
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          throw error;
+        }
+        throw new Error(`${errorContext}: Unknown error`);
+      }
+    }
+
+    // Handle successful responses
+    try {
+      if (contentType?.includes('application/json')) {
+        return await response.json();
+      }
+      const text = await response.text();
+      console.error('Unexpected non-JSON response:', text);
+      throw new Error('Server returned non-JSON response');
+    } catch (error) {
+      console.error('Response parsing error:', error);
+      throw new Error(`Failed to parse response: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   private async authenticate() {
@@ -20,6 +61,7 @@ export class CoolifyService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({
           email: this.email,
@@ -27,51 +69,41 @@ export class CoolifyService {
         }),
       });
 
-      console.log('Auth response status:', response.status);
-      console.log('Auth response headers:', Object.fromEntries(response.headers));
+      console.log('Auth response:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers),
+      });
 
-      const contentType = response.headers.get('content-type');
-      if (!contentType?.includes('application/json')) {
-        const text = await response.text();
-        console.error('Received non-JSON response:', text);
-        throw new Error('Server returned non-JSON response');
-      }
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Authentication failed: ${errorData.message || response.statusText}`);
-      }
-
-      const data = await response.json();
+      const data = await this.handleResponse(response, 'Authentication failed');
+      
       if (!data.token) {
         throw new Error('No token received in authentication response');
       }
 
       this.token = data.token;
       console.log('Authentication successful');
-    } catch (error: unknown) {
-      console.error('Coolify authentication error:', error);
-      if (error instanceof Error) {
-        throw new Error(`Authentication failed: ${error.message}`);
-      }
-      throw new Error('Authentication failed: Unknown error');
+      return data;
+    } catch (error) {
+      console.error('Authentication error:', error);
+      throw error;
     }
   }
 
   async deployService(nodeId: string, serviceConfig: any) {
     try {
       if (!this.token) {
-        console.log('No token found, authenticating first...');
         await this.authenticate();
       }
 
-      console.log('Deploying service:', { nodeId, ...serviceConfig });
+      console.log('Deploying service:', { nodeId, config: serviceConfig });
 
       const response = await fetch(`${this.baseUrl}/services/deploy`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.token}`,
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({
           nodeId,
@@ -79,79 +111,29 @@ export class CoolifyService {
         }),
       });
 
-      console.log('Deploy response status:', response.status);
-      
-      const contentType = response.headers.get('content-type');
-      if (!contentType?.includes('application/json')) {
-        const text = await response.text();
-        console.error('Received non-JSON response:', text);
-        throw new Error('Server returned non-JSON response');
-      }
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Deployment failed: ${errorData.message || response.statusText}`);
-      }
-
-      const data = await response.json();
+      const data = await this.handleResponse(response, 'Deployment failed');
       console.log('Deployment successful:', data);
       return data;
-    } catch (error: unknown) {
-      console.error('Service deployment error:', error);
-      if (error instanceof Error) {
-        throw new Error(`Deployment failed: ${error.message}`);
-      }
-      throw new Error('Deployment failed: Unknown error');
+    } catch (error) {
+      console.error('Deployment error:', error);
+      throw error;
     }
   }
 
-  async testConnection() {
+  async testConnection(): Promise<boolean> {
     try {
       const response = await fetch(`${this.baseUrl}/health`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
       });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Connection test failed: ${errorText}`);
-      }
-      
-      return await response.json();
-    } catch (error: unknown) {
-      console.error('Coolify connection error:', error);
-      if (error instanceof Error) {
-        throw new Error(`Connection test failed: ${error.message}`);
-      }
-      throw new Error('Connection test failed: Unknown error');
-    }
-  }
 
-  async deleteNode(nodeId: string) {
-    if (!this.token) {
-      await this.authenticate();
-    }
-
-    try {
-      const response = await fetch(`${this.baseUrl}/nodes/${nodeId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${this.token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to delete node: ${errorText}`);
-      }
-      
+      await this.handleResponse(response, 'Connection test failed');
       return true;
     } catch (error) {
-      console.error('Node deletion error:', error);
-      throw error;
+      console.error('Connection test error:', error);
+      return false;
     }
   }
 } 
