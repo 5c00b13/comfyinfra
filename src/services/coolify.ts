@@ -17,6 +17,15 @@ export class CoolifyService {
       console.log('Deploying service:', { nodeId, config: serviceConfig });
 
       const proxyUrl = import.meta.env.VITE_API_PROXY_URL || '/api/coolify';
+      
+      // Log the request details
+      console.log('Request details:', {
+        url: `${proxyUrl}/services`,
+        targetUrl: this.baseUrl,
+        token: this.token ? 'Present' : 'Missing',
+        serviceConfig
+      });
+
       const response = await fetch(`${proxyUrl}/services`, {
         method: 'POST',
         headers: {
@@ -36,9 +45,27 @@ export class CoolifyService {
         }),
       });
 
+      // Log response details
+      console.log('Response details:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+      });
+
       if (!response.ok) {
         const errorText = await response.text();
+        console.error('Error response body:', errorText);
+        console.error('Response headers:', Object.fromEntries(response.headers.entries()));
         throw new Error(`Deployment failed: ${response.status} - ${errorText}`);
+      }
+
+      // Check content type before parsing JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType?.includes('application/json')) {
+        const text = await response.text();
+        console.error('Unexpected content type:', contentType);
+        console.error('Response body:', text);
+        throw new Error(`Expected JSON but got ${contentType}`);
       }
 
       const data = await response.json();
