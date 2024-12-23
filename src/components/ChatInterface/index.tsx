@@ -68,12 +68,12 @@ export function ChatInterface() {
 
   return (
     <div className={cn(
-      "fixed bottom-0 right-4 w-96 bg-gray-900 rounded-t-lg shadow-xl border border-gray-800 flex flex-col",
-      "transition-all duration-300 ease-in-out",
-      isMinimized ? "h-12" : "h-[600px]"
+      "fixed bottom-0 left-0 right-0 bg-gray-900 shadow-xl border-t border-gray-800 flex flex-col",
+      "transition-all duration-300 ease-in-out z-50",
+      isMinimized ? "h-12" : "h-[400px]"
     )}>
       {/* Header */}
-      <div className="p-4 border-b border-gray-800 flex justify-between items-center cursor-pointer"
+      <div className="px-6 py-3 border-b border-gray-800 flex justify-between items-center cursor-pointer"
            onClick={() => setIsMinimized(!isMinimized)}>
         <h3 className="text-lg font-semibold text-gray-200">Infrastructure Assistant</h3>
         <button className="text-gray-400 hover:text-gray-200 transition-colors">
@@ -84,7 +84,7 @@ export function ChatInterface() {
       {/* Messages */}
       {!isMinimized && (
         <>
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin">
+          <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-thin">
             {messages.map((message, index) => (
               <Message key={index} message={message} />
             ))}
@@ -98,8 +98,8 @@ export function ChatInterface() {
           </div>
 
           {/* Input */}
-          <form onSubmit={handleSubmit} className="p-4 border-t border-gray-800">
-            <div className="flex space-x-2">
+          <form onSubmit={handleSubmit} className="p-6 border-t border-gray-800">
+            <div className="flex space-x-2 max-w-4xl mx-auto">
               <input
                 type="text"
                 value={input}
