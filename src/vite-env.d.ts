@@ -6,6 +6,7 @@ interface ImportMetaEnv {
   readonly VITE_COOLIFY_PASSWORD: string
   readonly VITE_CLAUDE_API_KEY: string
   readonly VITE_API_PROXY_URL?: string
+  readonly VITE_WORKER_URL: string
 }
 
 interface ImportMeta {

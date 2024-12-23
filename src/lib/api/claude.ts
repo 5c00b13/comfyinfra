@@ -1,12 +1,12 @@
 import { ChatMessage } from '../../types/chat';
 
+const WORKER_URL = import.meta.env.VITE_WORKER_URL;
+
 export async function sendChatMessage(messages: ChatMessage[]) {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+  const response = await fetch(`${WORKER_URL}/messages`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': import.meta.env.VITE_CLAUDE_API_KEY,
-      'anthropic-version': '2024-02-29'
     },
     body: JSON.stringify({
       model: 'claude-3-opus-20240229',
