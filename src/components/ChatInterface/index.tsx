@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 import { cn } from '../../lib/utils';
-import { Message } from '@/components/ChatInterface/Message';
+import { Message } from '../Message';
 import { sendChatMessage } from '../../lib/api/claude';
-import type { ChatMessage } from '@/types/chat';
+import type { ChatMessage } from '../../types/chat';
 
 interface ChatInterfaceProps {
   onClose: () => void;
