@@ -1,11 +1,5 @@
 import { ChatMessage } from '../../types/chat';
 
-const CLAUDE_API_KEY = import.meta.env.VITE_CLAUDE_API_KEY;
-
-if (!CLAUDE_API_KEY) {
-  console.error('VITE_CLAUDE_API_KEY is not set in environment variables');
-}
-
 export async function sendChatMessage(messages: ChatMessage[]) {
   const response = await fetch('/api/claude/v1/messages', {
     method: 'POST',
@@ -13,16 +7,23 @@ export async function sendChatMessage(messages: ChatMessage[]) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      messages,
       model: 'claude-3-opus-20240229',
+      messages: messages.map(msg => ({
+        role: msg.role,
+        content: [{
+          type: 'text',
+          text: msg.content
+        }]
+      })),
       max_tokens: 1024,
     }),
   });
 
   if (!response.ok) {
-    throw new Error('Failed to send message');
+    const error = await response.text();
+    throw new Error(`Failed to send message: ${error}`);
   }
 
   const data = await response.json();
-  return data.content;
+  return data.content[0].text;
 } 

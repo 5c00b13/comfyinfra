@@ -39,7 +39,7 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/api\/claude/, ''),
           headers: {
             'x-api-key': env.VITE_CLAUDE_API_KEY,
-            'anthropic-version': '2023-06-01'
+            'anthropic-version': '2024-02-29'
           }
         }
       },
