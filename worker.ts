@@ -27,27 +27,11 @@ async function handleRequest(request: ProxyRequest): Promise<Response> {
     if (request.url.includes('/messages')) {
       const claudeApiKey = process.env.CLAUDE_API_KEY;
       if (!claudeApiKey) {
-        throw new Error('Claude API key not configured');
-      }
-
-      const requestBody = await request.json();
-      
-      const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': claudeApiKey,
-          'anthropic-version': '2024-02-29'
-        },
-        body: JSON.stringify(requestBody)
-      });
-
-      if (!claudeResponse.ok) {
-        const errorText = await claudeResponse.text();
+        console.error('Claude API key not configured');
         return new Response(
-          JSON.stringify({ error: `Claude API error: ${errorText}` }), 
+          JSON.stringify({ error: 'Claude API key not configured' }), 
           { 
-            status: claudeResponse.status,
+            status: 500,
             headers: {
               ...corsHeaders,
               'Content-Type': 'application/json'
@@ -56,13 +40,80 @@ async function handleRequest(request: ProxyRequest): Promise<Response> {
         );
       }
 
-      const responseData = await claudeResponse.json();
-      return new Response(JSON.stringify(responseData), {
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/json'
+      try {
+        const requestBody = await request.json();
+        console.log('Claude API request:', requestBody);
+
+        const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': claudeApiKey,
+            'anthropic-version': '2024-02-29'
+          },
+          body: JSON.stringify(requestBody)
+        });
+
+        console.log('Claude API response status:', claudeResponse.status);
+        const responseText = await claudeResponse.text();
+        console.log('Claude API response:', responseText);
+
+        if (!claudeResponse.ok) {
+          return new Response(
+            JSON.stringify({ 
+              error: `Claude API error: ${responseText}`,
+              status: claudeResponse.status 
+            }), 
+            { 
+              status: claudeResponse.status,
+              headers: {
+                ...corsHeaders,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
         }
-      });
+
+        try {
+          const responseData = JSON.parse(responseText);
+          return new Response(JSON.stringify(responseData), {
+            headers: {
+              ...corsHeaders,
+              'Content-Type': 'application/json'
+            }
+          });
+        } catch (parseError) {
+          console.error('Failed to parse Claude response:', parseError);
+          return new Response(
+            JSON.stringify({ 
+              error: 'Invalid response from Claude API',
+              details: responseText
+            }), 
+            { 
+              status: 500,
+              headers: {
+                ...corsHeaders,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+        }
+      } catch (error) {
+        console.error('Error processing Claude request:', error);
+        return new Response(
+          JSON.stringify({ 
+            error: 'Error processing Claude request',
+            details: error instanceof Error ? error.message : 'Unknown error'
+          }), 
+          { 
+            status: 500,
+            headers: {
+              ...corsHeaders,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+      }
     }
 
     // Get the target URL from headers
@@ -112,9 +163,12 @@ async function handleRequest(request: ProxyRequest): Promise<Response> {
       headers: responseHeaders,
     });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Worker error:', error);
     return new Response(
-      JSON.stringify({ error: `Proxy error: ${errorMessage}` }), 
+      JSON.stringify({ 
+        error: 'Worker error',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      }), 
       { 
         status: 500,
         headers: {
