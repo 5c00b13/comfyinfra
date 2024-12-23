@@ -27,8 +27,19 @@ export default {
         body: JSON.stringify(body)
       });
 
-      const data = await response.json();
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Claude API error:', response.status, errorText);
+        return new Response(JSON.stringify({ error: `Claude API error: ${response.status}` }), {
+          status: response.status,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json'
+          }
+        });
+      }
 
+      const data = await response.json();
       return new Response(JSON.stringify(data), {
         headers: {
           'Access-Control-Allow-Origin': '*',
@@ -36,7 +47,11 @@ export default {
         }
       });
     } catch (error: any) {
-      return new Response(JSON.stringify({ error: error.message || 'Unknown error' }), {
+      console.error('Worker error:', error);
+      return new Response(JSON.stringify({ 
+        error: 'Worker error: ' + (error.message || 'Unknown error'),
+        details: error.toString()
+      }), {
         status: 500,
         headers: {
           'Access-Control-Allow-Origin': '*',
