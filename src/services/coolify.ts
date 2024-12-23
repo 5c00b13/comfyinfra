@@ -61,26 +61,26 @@ export class CoolifyService {
       try {
         console.log('Attempting authentication...', { attempt: retryCount + 1 });
         
-        const response = await fetch(`${this.baseUrl}/auth/login`, {
+        const proxyUrl = import.meta.env.VITE_API_PROXY_URL || '/api/coolify';
+        const response = await fetch(`${proxyUrl}/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
+            'X-Target-URL': this.baseUrl.replace(/\/+$/, ''),
           },
           body: JSON.stringify({
             email: this.email,
             password: this.password,
           }),
-          credentials: 'include', // Include cookies if needed
+          credentials: 'include',
         });
 
-        console.log('Auth response:', {
-          status: response.status,
-          statusText: response.statusText,
-          headers: Object.fromEntries(response.headers),
-        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-        const data = await this.handleResponse(response, 'Authentication failed');
+        const data = await response.json();
         
         if (!data.token) {
           throw new Error('No token received in authentication response');
@@ -91,11 +91,14 @@ export class CoolifyService {
         return data;
       } catch (error) {
         retryCount++;
+        console.error('Authentication attempt failed:', error);
+        
         if (retryCount === maxRetries) {
           console.error('Authentication failed after max retries:', error);
           throw error;
         }
-        console.warn(`Authentication attempt ${retryCount} failed, retrying...`);
+        
+        console.warn(`Authentication attempt ${retryCount} failed, retrying in ${retryCount}s...`);
         await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
       }
     }
@@ -109,20 +112,27 @@ export class CoolifyService {
 
       console.log('Deploying service:', { nodeId, config: serviceConfig });
 
-      const response = await fetch(`${this.baseUrl}/services/deploy`, {
+      const proxyUrl = import.meta.env.VITE_API_PROXY_URL || '/api/coolify';
+      const response = await fetch(`${proxyUrl}/services/deploy`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.token}`,
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'X-Target-URL': this.baseUrl.replace(/\/+$/, ''),
         },
         body: JSON.stringify({
           nodeId,
           ...serviceConfig,
         }),
+        credentials: 'include',
       });
 
-      const data = await this.handleResponse(response, 'Deployment failed');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
       console.log('Deployment successful:', data);
       return data;
     } catch (error) {
