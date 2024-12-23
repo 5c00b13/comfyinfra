@@ -2,11 +2,6 @@ interface ProxyRequest extends Request {
   headers: Headers;
 }
 
-interface Environment {
-  // Add any environment variables you need here
-  ALLOWED_ORIGINS?: string[];
-}
-
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
