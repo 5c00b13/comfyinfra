@@ -36,10 +36,17 @@ export default defineConfig(({ mode }) => {
         '/api/claude': {
           target: 'https://api.anthropic.com',
           changeOrigin: true,
+          secure: true,
           rewrite: (path) => path.replace(/^\/api\/claude/, ''),
-          headers: {
-            'x-api-key': env.VITE_CLAUDE_API_KEY,
-            'anthropic-version': '2024-02-29'
+          configure: (proxy, _options) => {
+            proxy.on('error', (err, _req, _res) => {
+              console.error('Claude Proxy error:', err);
+            });
+            proxy.on('proxyReq', (proxyReq, _req, _res) => {
+              proxyReq.setHeader('x-api-key', env.VITE_CLAUDE_API_KEY);
+              proxyReq.setHeader('anthropic-version', '2024-02-29');
+              proxyReq.setHeader('Content-Type', 'application/json');
+            });
           }
         }
       },
