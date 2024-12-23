@@ -17,9 +17,7 @@ export class CoolifyService {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Access-Control-Allow-Origin': '*',
         },
-        credentials: 'include',
         body: JSON.stringify({
           email: this.email,
           password: this.password,
@@ -53,9 +51,7 @@ export class CoolifyService {
           'Authorization': `Bearer ${this.token}`,
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Access-Control-Allow-Origin': '*',
         },
-        credentials: 'include',
         body: JSON.stringify({
           nodeId,
           ...serviceConfig,
@@ -83,9 +79,7 @@ export class CoolifyService {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Access-Control-Allow-Origin': '*',
         },
-        credentials: 'include',
       });
       
       if (!response.ok) {
