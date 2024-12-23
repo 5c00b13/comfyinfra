@@ -1,3 +1,14 @@
+interface Project {
+  uuid: string;
+  name: string;
+  description?: string;
+}
+
+interface Server {
+  uuid: string;
+  name: string;
+}
+
 export class CoolifyService {
   private token: string;
   private baseUrl: string;
@@ -8,8 +19,49 @@ export class CoolifyService {
       throw new Error('VITE_COOLIFY_API_TOKEN is not configured');
     }
     
-    // The base URL should point to the Coolify API
-    this.baseUrl = import.meta.env.VITE_COOLIFY_URL || 'http://localhost:8000/api/v1';
+    this.baseUrl = import.meta.env.VITE_COOLIFY_URL || 'http://localhost:8000';
+  }
+
+  async listProjects(): Promise<Project[]> {
+    try {
+      const baseUrl = this.baseUrl.replace(/\/+$/, '');
+      const response = await fetch(`${baseUrl}/api/v1/projects`, {
+        headers: {
+          'Authorization': `Bearer ${this.token}`,
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch projects: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      throw error;
+    }
+  }
+
+  async listServers(): Promise<Server[]> {
+    try {
+      const baseUrl = this.baseUrl.replace(/\/+$/, '');
+      const response = await fetch(`${baseUrl}/api/v1/servers`, {
+        headers: {
+          'Authorization': `Bearer ${this.token}`,
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch servers: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching servers:', error);
+      throw error;
+    }
   }
 
   async deployService(nodeId: string, serviceConfig: any) {
