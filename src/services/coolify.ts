@@ -54,39 +54,50 @@ export class CoolifyService {
   }
 
   private async authenticate() {
-    try {
-      console.log('Attempting authentication...');
-      
-      const response = await fetch(`${this.baseUrl}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          email: this.email,
-          password: this.password,
-        }),
-      });
+    const maxRetries = 3;
+    let retryCount = 0;
 
-      console.log('Auth response:', {
-        status: response.status,
-        statusText: response.statusText,
-        headers: Object.fromEntries(response.headers),
-      });
+    while (retryCount < maxRetries) {
+      try {
+        console.log('Attempting authentication...', { attempt: retryCount + 1 });
+        
+        const response = await fetch(`${this.baseUrl}/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify({
+            email: this.email,
+            password: this.password,
+          }),
+          credentials: 'include', // Include cookies if needed
+        });
 
-      const data = await this.handleResponse(response, 'Authentication failed');
-      
-      if (!data.token) {
-        throw new Error('No token received in authentication response');
+        console.log('Auth response:', {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers),
+        });
+
+        const data = await this.handleResponse(response, 'Authentication failed');
+        
+        if (!data.token) {
+          throw new Error('No token received in authentication response');
+        }
+
+        this.token = data.token;
+        console.log('Authentication successful');
+        return data;
+      } catch (error) {
+        retryCount++;
+        if (retryCount === maxRetries) {
+          console.error('Authentication failed after max retries:', error);
+          throw error;
+        }
+        console.warn(`Authentication attempt ${retryCount} failed, retrying...`);
+        await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
       }
-
-      this.token = data.token;
-      console.log('Authentication successful');
-      return data;
-    } catch (error) {
-      console.error('Authentication error:', error);
-      throw error;
     }
   }
 

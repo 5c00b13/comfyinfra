@@ -24,29 +24,17 @@ export default defineConfig(({ mode }) => {
               console.error('Proxy error:', err);
             });
             proxy.on('proxyReq', (proxyReq, req, _res) => {
-              // Add custom headers
               proxyReq.setHeader('X-Forwarded-Host', req.headers.host || '');
               proxyReq.setHeader('X-Forwarded-Proto', 'https');
-              
-              // Log outgoing request
-              console.log('Proxy request:', {
-                path: proxyReq.path,
-                method: proxyReq.method,
-                headers: proxyReq.getHeaders(),
-              });
-            });
-            proxy.on('proxyRes', (proxyRes, req, _res) => {
-              // Log incoming response
-              console.log('Proxy response:', {
-                status: proxyRes.statusCode,
-                headers: proxyRes.headers,
-                url: req.url,
-              });
+              // Add CORS headers
+              proxyReq.setHeader('Access-Control-Allow-Origin', '*');
+              proxyReq.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
+              proxyReq.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
             });
           },
         },
       },
-      cors: false, // Let the proxy handle CORS
+      cors: true // Enable CORS for development
     },
   };
 });
