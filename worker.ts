@@ -37,6 +37,12 @@ async function handleRequest(request: ProxyRequest): Promise<Response> {
     const headers = new Headers(request.headers);
     headers.delete('X-Target-URL');
     
+    // Ensure Authorization header is forwarded
+    const authHeader = request.headers.get('Authorization');
+    if (authHeader) {
+      headers.set('Authorization', authHeader);
+    }
+    
     const response = await fetch(targetFullUrl, {
       method: request.method,
       headers: headers,
@@ -48,6 +54,15 @@ async function handleRequest(request: ProxyRequest): Promise<Response> {
     Object.entries(corsHeaders).forEach(([key, value]) => {
       responseHeaders.set(key, value);
     });
+    
+    // If the response is not OK, try to get more detailed error information
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error('Proxy error response:', {
+        status: response.status,
+        body: errorBody
+      });
+    }
     
     return new Response(response.body, {
       status: response.status,
