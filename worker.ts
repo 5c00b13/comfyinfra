@@ -14,18 +14,18 @@ const corsHeaders = {
   'Access-Control-Max-Age': '86400',
 };
 
-async function handleOptions(request: Request): Promise<Response> {
+async function handleOptions(): Promise<Response> {
   // Handle CORS preflight requests
   return new Response(null, {
     headers: corsHeaders,
   });
 }
 
-async function handleRequest(request: ProxyRequest, env: Environment): Promise<Response> {
+async function handleRequest(request: ProxyRequest): Promise<Response> {
   try {
     // Handle OPTIONS requests
     if (request.method === 'OPTIONS') {
-      return handleOptions(request);
+      return handleOptions();
     }
 
     // Get the target URL from headers
@@ -71,11 +71,9 @@ async function handleRequest(request: ProxyRequest, env: Environment): Promise<R
 // Export for Cloudflare Workers
 export default {
   async fetch(
-    request: Request,
-    env: Environment,
-    ctx: ExecutionContext
+    request: Request
   ): Promise<Response> {
-    return handleRequest(request as ProxyRequest, env);
+    return handleRequest(request as ProxyRequest);
   },
 };
 
@@ -97,6 +95,6 @@ declare global {
 // For non-module workers, uncomment this:
 /*
 addEventListener('fetch', (event: FetchEvent) => {
-  event.respondWith(handleRequest(event.request as ProxyRequest, {} as Environment));
+  event.respondWith(handleRequest(event.request as ProxyRequest));
 });
 */ 
