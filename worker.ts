@@ -23,6 +23,48 @@ async function handleRequest(request: ProxyRequest): Promise<Response> {
       return handleOptions();
     }
 
+    // Special handling for Claude API requests
+    if (request.url.includes('/messages')) {
+      const claudeApiKey = process.env.CLAUDE_API_KEY;
+      if (!claudeApiKey) {
+        throw new Error('Claude API key not configured');
+      }
+
+      const requestBody = await request.json();
+      
+      const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': claudeApiKey,
+          'anthropic-version': '2024-02-29'
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!claudeResponse.ok) {
+        const errorText = await claudeResponse.text();
+        return new Response(
+          JSON.stringify({ error: `Claude API error: ${errorText}` }), 
+          { 
+            status: claudeResponse.status,
+            headers: {
+              ...corsHeaders,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+      }
+
+      const responseData = await claudeResponse.json();
+      return new Response(JSON.stringify(responseData), {
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
+      });
+    }
+
     // Get the target URL from headers
     const targetUrl = request.headers.get('X-Target-URL');
     if (!targetUrl) {
@@ -71,10 +113,16 @@ async function handleRequest(request: ProxyRequest): Promise<Response> {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(`Proxy error: ${errorMessage}`, { 
-      status: 500,
-      headers: corsHeaders,
-    });
+    return new Response(
+      JSON.stringify({ error: `Proxy error: ${errorMessage}` }), 
+      { 
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
   }
 }
 

@@ -39,15 +39,13 @@ export function ChatInterface() {
     setIsLoading(true);
 
     try {
-      const response = await sendChatMessage([
-        {
-          role: 'system',
-          content: 'You are an AI assistant helping with infrastructure management. You can help with creating and managing infrastructure nodes, deployment configurations, and general infrastructure questions.',
-          timestamp: new Date().toISOString()
-        },
-        ...messages,
-        userMessage
-      ]);
+      const systemMessage: ChatMessage = {
+        role: 'system',
+        content: 'You are an AI assistant helping with infrastructure management. You can help with creating and managing infrastructure nodes, deployment configurations, and general infrastructure questions.',
+        timestamp: new Date().toISOString()
+      };
+
+      const response = await sendChatMessage([systemMessage, ...messages, userMessage]);
 
       setMessages(prev => [...prev, {
         role: 'assistant',
@@ -57,8 +55,8 @@ export function ChatInterface() {
     } catch (error) {
       console.error('Chat error:', error);
       setMessages(prev => [...prev, {
-        role: 'system',
-        content: 'Sorry, there was an error processing your request. Please try again later.',
+        role: 'assistant',
+        content: 'I apologize, but I encountered an error processing your request. Please try again or contact support if the issue persists.',
         timestamp: new Date().toISOString(),
       }]);
     } finally {
