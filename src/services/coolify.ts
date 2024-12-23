@@ -16,29 +16,28 @@ export class CoolifyService {
     try {
       console.log('Deploying service:', { nodeId, config: serviceConfig });
 
-      const proxyUrl = import.meta.env.VITE_API_PROXY_URL || '/api/coolify';
+      const apiUrl = this.baseUrl;
       
       // Log the request details
       console.log('Request details:', {
-        url: `${proxyUrl}/services`,
-        targetUrl: this.baseUrl,
+        url: `${apiUrl}/services`,
         token: this.token ? 'Present' : 'Missing',
         serviceConfig
       });
 
-      const response = await fetch(`${proxyUrl}/services`, {
+      const response = await fetch(`${apiUrl}/services`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.token}`,
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'X-Target-URL': this.baseUrl,
         },
         body: JSON.stringify({
           type: serviceConfig.type,
-          name: `${serviceConfig.type}-${nodeId}`,
+          name: serviceConfig.name || `${serviceConfig.type}-${nodeId}`,
+          description: serviceConfig.description,
           project_uuid: serviceConfig.project_uuid,
-          environment_name: serviceConfig.environment_name || 'production',
+          environment_name: serviceConfig.environment_name,
           server_uuid: serviceConfig.server_uuid,
           destination_uuid: serviceConfig.destination_uuid,
           instant_deploy: true
@@ -57,15 +56,6 @@ export class CoolifyService {
         console.error('Error response body:', errorText);
         console.error('Response headers:', Object.fromEntries(response.headers.entries()));
         throw new Error(`Deployment failed: ${response.status} - ${errorText}`);
-      }
-
-      // Check content type before parsing JSON
-      const contentType = response.headers.get('content-type');
-      if (!contentType?.includes('application/json')) {
-        const text = await response.text();
-        console.error('Unexpected content type:', contentType);
-        console.error('Response body:', text);
-        throw new Error(`Expected JSON but got ${contentType}`);
       }
 
       const data = await response.json();
