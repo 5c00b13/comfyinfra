@@ -5,7 +5,7 @@ import { cn } from '../../lib/utils';
 import type { InfraNode } from '../../types';
 import { Trash2, Play, Loader2 } from 'lucide-react';
 import { CoolifyService } from '../../services/coolify';
-import { DeploymentConfigForm } from './DeploymentConfigForm';
+import { DeploymentConfigForm } from '../DeploymentConfigForm';
 
 const coolifyService = new CoolifyService();
 
