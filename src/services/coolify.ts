@@ -5,7 +5,7 @@ export class CoolifyService {
   private token: string | null = null;
 
   constructor() {
-    this.baseUrl = import.meta.env.VITE_COOLIFY_URL.replace(/\/+$/, '');
+    this.baseUrl = '/api/coolify';
     this.email = import.meta.env.VITE_COOLIFY_EMAIL;
     this.password = import.meta.env.VITE_COOLIFY_PASSWORD;
   }
@@ -16,7 +16,6 @@ export class CoolifyService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
         },
         body: JSON.stringify({
           email: this.email,
@@ -25,7 +24,8 @@ export class CoolifyService {
       });
 
       if (!response.ok) {
-        throw new Error(`Authentication failed: ${response.statusText}`);
+        const errorText = await response.text();
+        throw new Error(`Authentication failed: ${errorText}`);
       }
 
       const data = await response.json();
@@ -50,7 +50,6 @@ export class CoolifyService {
         headers: {
           'Authorization': `Bearer ${this.token}`,
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
         },
         body: JSON.stringify({
           nodeId,
@@ -59,7 +58,8 @@ export class CoolifyService {
       });
 
       if (!response.ok) {
-        throw new Error(`Deployment failed: ${response.statusText}`);
+        const errorText = await response.text();
+        throw new Error(`Deployment failed: ${errorText}`);
       }
 
       return await response.json();
@@ -78,12 +78,12 @@ export class CoolifyService {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
         },
       });
       
       if (!response.ok) {
-        throw new Error(`Connection test failed: ${response.statusText}`);
+        const errorText = await response.text();
+        throw new Error(`Connection test failed: ${errorText}`);
       }
       
       return await response.json();
@@ -97,16 +97,22 @@ export class CoolifyService {
   }
 
   async deleteNode(nodeId: string) {
+    if (!this.token) {
+      await this.authenticate();
+    }
+
     try {
       const response = await fetch(`${this.baseUrl}/nodes/${nodeId}`, {
         method: 'DELETE',
         headers: {
+          'Authorization': `Bearer ${this.token}`,
           'Content-Type': 'application/json',
         },
       });
       
       if (!response.ok) {
-        throw new Error('Failed to delete node');
+        const errorText = await response.text();
+        throw new Error(`Failed to delete node: ${errorText}`);
       }
       
       return true;
