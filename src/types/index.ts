@@ -19,10 +19,3 @@ export interface InfraNode {
   status: 'healthy' | 'warning' | 'error' | 'deploying';
   config: Record<string, any>;
 }
-
-export interface VoiceCommand {
-  action: 'create' | 'delete' | 'update' | 'connect';
-  nodeType?: string;
-  nodeId?: string;
-  parameters?: Record<string, any>;
-}

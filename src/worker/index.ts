@@ -1,4 +1,3 @@
-import { handleClaudeRequest } from './handlers/claude.js';
 import { handleCoolifyRequest } from './handlers/coolify.js';
 import { corsHeaders } from './utils/cors.js';
 import http from 'http';
@@ -14,11 +13,6 @@ async function handleRequest(request: ProxyRequest): Promise<Response> {
     }
 
     const url = new URL(request.url);
-
-    // Route requests based on path
-    if (url.pathname === '/api/claude') {
-      return handleClaudeRequest(request);
-    }
 
     if (url.pathname.startsWith('/api/coolify')) {
       return handleCoolifyRequest(request);

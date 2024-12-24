@@ -11,7 +11,6 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import CustomNode from './CustomNode';
 import { NodeToolbar } from './NodeToolbar';
-import { useVoiceCommands } from '../../hooks/useVoiceCommands';
 import { createNode } from '../../lib/node-utils';
 import { cn } from '../../lib/utils';
 import type { InfraNode } from '../../types';
@@ -25,7 +24,6 @@ const defaultViewport = { x: 0, y: 0, zoom: 1 };
 export default function InfrastructureCanvas() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const { isListening, startListening } = useVoiceCommands();
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
@@ -75,20 +73,6 @@ export default function InfrastructureCanvas() {
           <NodeToolbar onAddNode={handleAddNode} />
         </Panel>
       </ReactFlow>
-      
-      <div className="absolute bottom-4 right-4">
-        <button
-          onClick={startListening}
-          className={cn(
-            'px-4 py-2 rounded-full',
-            'bg-gray-800 text-gray-200',
-            'hover:bg-gray-700 transition-colors',
-            isListening && 'bg-green-600 hover:bg-green-700'
-          )}
-        >
-          {isListening ? 'Listening...' : 'Start Voice Commands'}
-        </button>
-      </div>
     </div>
   );
 }
