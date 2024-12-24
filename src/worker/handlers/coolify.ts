@@ -1,4 +1,4 @@
-import { corsHeaders } from '../utils/cors';
+import { corsHeaders } from '../utils/cors.js';
 
 export async function handleCoolifyRequest(request: Request): Promise<Response> {
   const coolifyToken = process.env.VITE_COOLIFY_API_TOKEN;

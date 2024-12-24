@@ -1,4 +1,4 @@
-import { corsHeaders } from '../utils/cors';
+import { corsHeaders } from '../utils/cors.js';
 import Anthropic from '@anthropic-ai/sdk';
 
 export async function handleClaudeRequest(request: Request): Promise<Response> {
