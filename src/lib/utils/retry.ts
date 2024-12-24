@@ -1,13 +1,13 @@
 export async function retry<T>(
   fn: () => Promise<T>,
-  attempts: number,
-  delay: number
+  options: { retries?: number; signal?: AbortSignal } = {}
 ): Promise<T> {
+  const { retries = 3, signal } = options;
   try {
     return await fn();
   } catch (error) {
-    if (attempts <= 1) throw error;
-    await new Promise(resolve => setTimeout(resolve, delay));
-    return retry(fn, attempts - 1, delay);
+    if (retries <= 1) throw error;
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Using 1 second delay
+    return retry(fn, { retries: retries - 1, signal });
   }
 }

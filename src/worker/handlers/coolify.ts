@@ -1,8 +1,8 @@
 import { corsHeaders } from '../utils/cors';
 
 export async function handleCoolifyRequest(request: Request): Promise<Response> {
-  const coolifyToken = process.env.COOLIFY_API_TOKEN;
-  const coolifyUrl = process.env.COOLIFY_URL;
+  const coolifyToken = process.env.VITE_COOLIFY_API_TOKEN;
+  const coolifyUrl = process.env.VITE_COOLIFY_URL;
 
   if (!coolifyToken || !coolifyUrl) {
     return new Response('Coolify configuration missing', { 

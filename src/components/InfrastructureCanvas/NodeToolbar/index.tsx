@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ServiceButton } from './ServiceButton';
 import { cn } from '../../../lib/utils';
-import { CONFIG } from '../../../lib/config';
 import type { ServiceType } from '../../../types';
 import { fetchTemplates } from '../../../lib/api/pocketbase';
 import type { Template } from '../../../lib/types/template';

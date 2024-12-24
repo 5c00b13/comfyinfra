@@ -1,9 +1,9 @@
 import { corsHeaders } from '../utils/cors';
 
 export async function handleClaudeRequest(request: Request): Promise<Response> {
-  const claudeApiKey = process.env.CLAUDE_API_KEY;
+  const claudeApiKey = process.env.VITE_CLAUDE_API_KEY;
   if (!claudeApiKey) {
-    return new Response('Claude API key not configured', { 
+    return new Response('VITE_CLAUDE_API_KEY is not configured', { 
       status: 500,
       headers: corsHeaders 
     });
