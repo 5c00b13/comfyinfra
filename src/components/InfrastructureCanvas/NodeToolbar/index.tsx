@@ -24,14 +24,21 @@ export function NodeToolbar({ onAddNode }: NodeToolbarProps) {
         setLoading(true);
         const data = await fetchTemplates(controller.signal);
         if (!controller.signal.aborted) {
-          setTemplates(data);
+          // Filter out templates with invalid types
+          const validTemplates = data.filter(template => {
+            if (!template.type) {
+              console.warn(`Template ${template.id} has no type`);
+              return false;
+            }
+            return true;
+          });
+          setTemplates(validTemplates);
           setError(null);
         }
       } catch (err) {
         if (!controller.signal.aborted) {
           console.error('Failed to load templates:', err);
           setError('Failed to load service templates. Please try again later.');
-          // Fallback to default templates if available
           setTemplates([]);
         }
       } finally {
@@ -50,6 +57,14 @@ export function NodeToolbar({ onAddNode }: NodeToolbarProps) {
     return <LoadingSpinner message="Loading templates..." />;
   }
 
+  const handleAddNode = (template: Template) => {
+    if (!template.type) {
+      console.error('Template has no type:', template);
+      return;
+    }
+    onAddNode(template.type as ServiceType);
+  };
+
   return (
     <div className="fixed top-4 left-1/2 -translate-x-1/2 z-10">
       <div className={cn(
@@ -65,7 +80,7 @@ export function NodeToolbar({ onAddNode }: NodeToolbarProps) {
               key={template.id}
               label={template.name}
               iconUrl={template.icon}
-              onClick={() => onAddNode(template.type as ServiceType)}
+              onClick={() => handleAddNode(template)}
             />
           ))
         ) : (
