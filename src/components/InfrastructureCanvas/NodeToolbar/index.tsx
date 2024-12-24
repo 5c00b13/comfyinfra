@@ -66,28 +66,36 @@ export function NodeToolbar({ onAddNode }: NodeToolbarProps) {
   };
 
   return (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-10">
+    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-10 max-w-[90vw]">
       <div className={cn(
-        'flex gap-2 p-4 rounded-lg',
+        'p-4 rounded-lg',
         'bg-gray-900/90 backdrop-blur-sm shadow-xl',
         'border border-gray-800'
       )}>
-        {error ? (
-          <ErrorMessage message={error} />
-        ) : templates.length > 0 ? (
-          templates.map((template) => (
-            <ServiceButton
-              key={template.id}
-              label={template.name}
-              iconUrl={template.icon}
-              onClick={() => handleAddNode(template)}
-            />
-          ))
-        ) : (
-          <div className="text-gray-400 text-sm">
-            No templates available
-          </div>
-        )}
+        <div className={cn(
+          'flex gap-2',
+          'overflow-x-auto',
+          'scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600',
+          'min-w-[200px] max-w-full',
+          'pb-2' // Add padding to show scrollbar
+        )}>
+          {error ? (
+            <ErrorMessage message={error} />
+          ) : templates.length > 0 ? (
+            templates.map((template) => (
+              <ServiceButton
+                key={template.id}
+                label={template.name}
+                iconUrl={template.icon}
+                onClick={() => handleAddNode(template)}
+              />
+            ))
+          ) : (
+            <div className="text-gray-400 text-sm">
+              No templates available
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
