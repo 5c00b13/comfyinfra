@@ -245,6 +245,19 @@
             },
             {
                 "hidden": false,
+                "id": "text_type",
+                "max": 50,
+                "min": 0,
+                "name": "type",
+                "pattern": "",
+                "presentable": false,
+                "primaryKey": false,
+                "required": true,
+                "system": false,
+                "type": "text"
+            },
+            {
+                "hidden": false,
                 "id": "file1704208859",
                 "maxSelect": 1,
                 "maxSize": 0,
