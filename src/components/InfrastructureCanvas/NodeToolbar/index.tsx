@@ -22,6 +22,7 @@ export function NodeToolbar({ onAddNode }: NodeToolbarProps) {
 
     async function loadTemplates() {
       try {
+        setLoading(true);
         const data = await fetchTemplates(controller.signal);
         if (!controller.signal.aborted) {
           setTemplates(data);
@@ -29,8 +30,10 @@ export function NodeToolbar({ onAddNode }: NodeToolbarProps) {
         }
       } catch (err) {
         if (!controller.signal.aborted) {
-          setError(CONFIG.ERROR_MESSAGES.FETCH_FAILED);
-          console.error('Template loading error:', err);
+          console.error('Failed to load templates:', err);
+          setError('Failed to load service templates. Please try again later.');
+          // Fallback to default templates if available
+          setTemplates([]);
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -48,44 +51,27 @@ export function NodeToolbar({ onAddNode }: NodeToolbarProps) {
     return <LoadingSpinner message="Loading templates..." />;
   }
 
-  if (error) {
-    return <ErrorMessage message={error} />;
-  }
-
   return (
     <div className="fixed top-4 left-1/2 -translate-x-1/2 z-10">
       <div className={cn(
         'flex gap-2 p-4 rounded-lg',
         'bg-gray-900/90 backdrop-blur-sm shadow-xl',
-        'border border-gray-800',
-        'overflow-x-auto',
-        'max-w-[calc(100vw-2rem)]',
-        'scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent'
+        'border border-gray-800'
       )}>
-        {templates.length > 0 ? (
-          templates.map((template) => {
-            console.log('Template:', template);
-            
-            if (!template.type) {
-              console.error('Template missing type:', template);
-              return null;
-            }
-
-            return (
-              <ServiceButton
-                key={template.id}
-                label={template.name}
-                iconUrl={template.icon}
-                onClick={() => {
-                  console.log('Clicking template with type:', template.type);
-                  onAddNode(template.type as ServiceType);
-                }}
-              />
-            );
-          })
+        {error ? (
+          <ErrorMessage message={error} />
+        ) : templates.length > 0 ? (
+          templates.map((template) => (
+            <ServiceButton
+              key={template.id}
+              label={template.name}
+              iconUrl={template.icon}
+              onClick={() => onAddNode(template.type as ServiceType)}
+            />
+          ))
         ) : (
           <div className="text-gray-400 text-sm">
-            {CONFIG.ERROR_MESSAGES.NO_TEMPLATES}
+            No templates available
           </div>
         )}
       </div>
