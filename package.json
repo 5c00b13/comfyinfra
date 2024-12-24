@@ -5,9 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "server": "ts-node src/server.ts",
-    "start": "concurrently \"npm run dev\" \"npm run server\"",
     "build": "vite build",
+    "build:worker": "tsc -p tsconfig.worker.json",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest"

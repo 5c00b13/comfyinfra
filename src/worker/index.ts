@@ -43,7 +43,5 @@ async function handleRequest(request: ProxyRequest): Promise<Response> {
 }
 
 export default {
-  async fetch(request: Request): Promise<Response> {
-    return handleRequest(request as ProxyRequest);
-  },
+  fetch: (request: Request): Promise<Response> => handleRequest(request as ProxyRequest)
 }; 

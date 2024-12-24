@@ -2,13 +2,15 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# Install dependencies
+# Copy package files and TypeScript configs
 COPY package*.json ./
+COPY tsconfig*.json ./
+
+# Install dependencies
 RUN npm install
 
 # Copy worker source code
-COPY src/worker ./worker
-COPY tsconfig.json ./
+COPY src/worker ./src/worker
 
 # Build the worker
 RUN npm run build:worker
@@ -17,4 +19,4 @@ RUN npm run build:worker
 EXPOSE 8080
 
 # Start the worker
-CMD ["node", "dist/worker.js"] 
+CMD ["node", "dist/worker/index.js"] 
