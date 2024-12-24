@@ -1,8 +1,12 @@
 import { ChatMessage } from '../../types/chat';
 
-const WORKER_URL = import.meta.env.VITE_WORKER_URL;
+const WORKER_URL = import.meta.env.VITE_WORKER_URL?.replace(/\/$/, '') || '';
 
 export async function sendChatMessage(messages: ChatMessage[]): Promise<string> {
+  if (!WORKER_URL) {
+    throw new Error('VITE_WORKER_URL environment variable is not configured');
+  }
+
   try {
     const response = await fetch(`${WORKER_URL}/api/claude`, {
       method: 'POST',
@@ -10,8 +14,6 @@ export async function sendChatMessage(messages: ChatMessage[]): Promise<string> 
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "claude-3-sonnet-20240229",
-        max_tokens: 1024,
         messages: messages.map(msg => ({
           role: msg.role,
           content: msg.content
