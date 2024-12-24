@@ -15,7 +15,7 @@ async function handleRequest(request: ProxyRequest): Promise<Response> {
     const url = new URL(request.url);
 
     // Route requests based on path
-    if (url.pathname.startsWith('/api/claude')) {
+    if (url.pathname === '/api/claude') {
       return handleClaudeRequest(request);
     }
 
