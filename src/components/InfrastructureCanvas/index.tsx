@@ -12,7 +12,6 @@ import 'reactflow/dist/style.css';
 import CustomNode from './CustomNode';
 import { NodeToolbar } from './NodeToolbar';
 import { createNode } from '../../lib/node-utils';
-import { cn } from '../../lib/utils';
 import type { InfraNode } from '../../types';
 
 const nodeTypes = {
