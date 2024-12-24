@@ -15,14 +15,15 @@ COPY src ./src
 # Create dist directory
 RUN mkdir -p dist/worker
 
-# Build the worker
-RUN npm run build:worker
-
-# Rename the output file to .mjs for ESM
-RUN mv dist/worker/index.js dist/worker/index.mjs
+# Build the worker and list output for debugging
+RUN npm run build:worker && \
+    echo "Listing dist directory:" && \
+    ls -la dist && \
+    echo "Listing dist/worker directory:" && \
+    ls -la dist/worker
 
 # Expose the port
 EXPOSE 8080
 
-# Start the worker with .mjs extension
-CMD ["node", "dist/worker/index.mjs"] 
+# Start the worker (using .js extension for now)
+CMD ["node", "dist/worker/index.js"] 
