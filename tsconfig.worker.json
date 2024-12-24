@@ -2,10 +2,10 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "target": "ES2020",
-    "module": "CommonJS",
+    "module": "ESNext",
     "outDir": "dist/worker",
     "rootDir": "src/worker",
-    "moduleResolution": "node"
+    "moduleResolution": "bundler"
   },
   "include": ["src/worker/**/*"],
   "exclude": ["node_modules", "dist"]

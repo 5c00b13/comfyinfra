@@ -18,8 +18,11 @@ RUN mkdir -p dist/worker
 # Build the worker
 RUN npm run build:worker
 
+# Rename the output file to .mjs for ESM
+RUN mv dist/worker/index.js dist/worker/index.mjs
+
 # Expose the port
 EXPOSE 8080
 
-# Start the worker
-CMD ["node", "dist/worker/index.js"] 
+# Start the worker with .mjs extension
+CMD ["node", "dist/worker/index.mjs"] 
