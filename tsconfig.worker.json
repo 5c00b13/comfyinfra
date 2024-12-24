@@ -7,7 +7,9 @@
     "rootDir": "src/worker",
     "moduleResolution": "bundler",
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "noEmit": false,
+    "allowImportingTsExtensions": false
   },
   "include": ["src/worker/**/*"],
   "exclude": ["node_modules", "dist"]
