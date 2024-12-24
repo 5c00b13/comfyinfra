@@ -9,8 +9,8 @@ COPY tsconfig*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy worker source code
-COPY src/worker ./src/worker
+# Copy entire src directory to ensure imports work
+COPY src ./src
 
 # Create dist directory
 RUN mkdir -p dist/worker
