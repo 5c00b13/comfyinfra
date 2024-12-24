@@ -1,6 +1,6 @@
-import { handleClaudeRequest } from './handlers/claude';
-import { handleCoolifyRequest } from './handlers/coolify';
-import { corsHeaders } from './utils/cors';
+import { handleClaudeRequest } from './handlers/claude.js';
+import { handleCoolifyRequest } from './handlers/coolify.js';
+import { corsHeaders } from './utils/cors.js';
 
 interface ProxyRequest extends Request {
   headers: Headers;
