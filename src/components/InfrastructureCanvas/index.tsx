@@ -6,13 +6,9 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   addEdge,
-  Panel,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import CustomNode from './CustomNode';
-import { createNode } from '../../lib/node-utils';
-import type { InfraNode } from '../../types';
-
 const nodeTypes = {
   custom: CustomNode,
 };
