@@ -15,9 +15,38 @@ export async function handleClaudeRequest(request: Request): Promise<Response> {
       apiKey: apiKey
     });
 
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      console.error('Failed to parse request body:', parseError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid request body - must be valid JSON' }), 
+        { 
+          status: 400,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+    }
+
+    if (!body.messages || !Array.isArray(body.messages)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid request format - messages array is required' }), 
+        { 
+          status: 400,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+    }
+
     const msg = await anthropic.messages.create({
-      model: "claude-3-sonnet-20240229",
+      model: "claude-3-5-sonnet-20241022",
       max_tokens: 1024,
       messages: body.messages
     });
@@ -30,8 +59,30 @@ export async function handleClaudeRequest(request: Request): Promise<Response> {
     });
   } catch (error) {
     console.error('Claude API error:', error);
+    
+    // Check if it's an Anthropic API error
+    if (error instanceof Anthropic.APIError) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Claude API error',
+          details: error.message,
+          status: error.status
+        }), 
+        { 
+          status: error.status || 500,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+    }
+
     return new Response(
-      JSON.stringify({ error: 'Claude API error' }), 
+      JSON.stringify({ 
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      }), 
       { 
         status: 500,
         headers: {
