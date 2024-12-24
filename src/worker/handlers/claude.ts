@@ -16,13 +16,13 @@ export async function handleClaudeRequest(request: Request): Promise<Response> {
     });
 
     const body = await request.json();
-    const response = await anthropic.messages.create({
-      model: "claude-3-opus-20240229",
+    const msg = await anthropic.messages.create({
+      model: "claude-3-sonnet-20240229",
       max_tokens: 1024,
       messages: body.messages
     });
 
-    return new Response(JSON.stringify(response), {
+    return new Response(JSON.stringify({ content: msg.content[0].text }), {
       headers: {
         ...corsHeaders,
         'Content-Type': 'application/json'

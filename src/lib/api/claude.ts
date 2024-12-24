@@ -10,7 +10,7 @@ export async function sendChatMessage(messages: ChatMessage[]): Promise<string> 
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-3-opus-20240229',
+        model: "claude-3-sonnet-20240229",
         max_tokens: 1024,
         messages: messages.map(msg => ({
           role: msg.role,
@@ -25,7 +25,7 @@ export async function sendChatMessage(messages: ChatMessage[]): Promise<string> 
     }
 
     const data = await response.json();
-    return data.content[0].text;
+    return data.content;
   } catch (error) {
     console.error('Chat API error:', error);
     throw error;
