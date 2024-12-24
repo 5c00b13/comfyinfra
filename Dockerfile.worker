@@ -29,6 +29,9 @@ RUN set -x && \
     echo "Content of dist/worker:" && \
     find dist/worker -type f
 
+# Add package.json type module
+RUN echo '{"type":"module"}' > dist/worker/package.json
+
 # Expose the port
 EXPOSE 8080
 
