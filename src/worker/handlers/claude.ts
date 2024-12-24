@@ -1,8 +1,9 @@
 import { corsHeaders } from '../utils/cors';
+import Anthropic from '@anthropic-ai/sdk';
 
 export async function handleClaudeRequest(request: Request): Promise<Response> {
-  const claudeApiKey = process.env.VITE_CLAUDE_API_KEY;
-  if (!claudeApiKey) {
+  const apiKey = process.env.VITE_CLAUDE_API_KEY;
+  if (!apiKey) {
     return new Response('VITE_CLAUDE_API_KEY is not configured', { 
       status: 500,
       headers: corsHeaders 
@@ -10,18 +11,18 @@ export async function handleClaudeRequest(request: Request): Promise<Response> {
   }
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: request.method,
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': claudeApiKey,
-        'anthropic-version': '2024-02-29'
-      },
-      body: request.body
+    const anthropic = new Anthropic({
+      apiKey: apiKey
     });
 
-    const responseData = await response.json();
-    return new Response(JSON.stringify(responseData), {
+    const body = await request.json();
+    const response = await anthropic.messages.create({
+      model: "claude-3-opus-20240229",
+      max_tokens: 1024,
+      messages: body.messages
+    });
+
+    return new Response(JSON.stringify(response), {
       headers: {
         ...corsHeaders,
         'Content-Type': 'application/json'
