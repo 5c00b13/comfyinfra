@@ -8,7 +8,7 @@ services:
     ports:
       - "3030:3030"
     environment:
-      - VITE_WORKER_URL=http://api-proxy:8081
+      - VITE_WORKER_URL=http://api-proxy:8080
       - VITE_POCKETBASE_URL=${VITE_POCKETBASE_URL}
     depends_on:
       - api-proxy
