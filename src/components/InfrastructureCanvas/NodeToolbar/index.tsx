@@ -74,10 +74,8 @@ export function NodeToolbar({ onAddNode }: NodeToolbarProps) {
       )}>
         <div className={cn(
           'flex gap-2',
-          'overflow-x-auto',
-          'scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600',
-          'min-w-[200px] max-w-full',
-          'pb-2' // Add padding to show scrollbar
+          'overflow-x-auto scrollbar-none',
+          'min-w-[200px] max-w-full'
         )}>
           {error ? (
             <ErrorMessage message={error} />
