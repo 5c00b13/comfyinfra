@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:worker": "tsc -p tsconfig.worker.json",
+    "build:worker": "tsc --project tsconfig.worker.json",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest"
