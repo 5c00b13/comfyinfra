@@ -10,7 +10,6 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import CustomNode from './CustomNode';
-import { NodeToolbar } from './NodeToolbar';
 import { createNode } from '../../lib/node-utils';
 import type { InfraNode } from '../../types';
 
@@ -28,15 +27,6 @@ export default function InfrastructureCanvas() {
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
     [setEdges],
   );
-
-  const handleAddNode = useCallback((type: InfraNode['type']) => {
-    const position = {
-      x: Math.random() * (window.innerWidth / 2) + 100,
-      y: Math.random() * (window.innerHeight / 2) + 100,
-    };
-    const newNode = createNode(type, position);
-    setNodes((nds) => [...nds, newNode]);
-  }, [setNodes]);
 
   useEffect(() => {
     const handleDeleteNode = (event: CustomEvent<{ nodeId: string }>) => {
@@ -68,9 +58,6 @@ export default function InfrastructureCanvas() {
       >
         <Background className="bg-gray-900" />
         <Controls className="bg-gray-800 border-gray-700" />
-        <Panel position="top-left" className="bg-transparent border-none">
-          <NodeToolbar onAddNode={handleAddNode} />
-        </Panel>
       </ReactFlow>
     </div>
   );
