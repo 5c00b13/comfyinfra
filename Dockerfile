@@ -9,17 +9,24 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy source code
+# Copy source code (excluding worker)
 COPY . .
+RUN rm -rf src/worker
 
-# Build the application
+# Build the frontend application
 RUN npm run build
 
-# Install serve globally
+# Production stage
+FROM node:20-slim
+
+WORKDIR /app
+
+# Install serve
 RUN npm install -g serve
 
-# Expose port 3000 (serve's default port)
+# Copy built frontend
+COPY --from=build /app/dist ./dist
+
 EXPOSE 3030
 
-# Start serve
-CMD ["serve", "-s", "dist"]
+CMD ["serve", "-s", "dist", "-l", "3030"]

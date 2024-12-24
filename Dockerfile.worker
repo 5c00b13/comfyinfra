@@ -1,0 +1,20 @@
+FROM node:20-slim
+
+WORKDIR /app
+
+# Install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy worker source code
+COPY src/worker ./worker
+COPY tsconfig.json ./
+
+# Build the worker
+RUN npm run build:worker
+
+# Expose the port
+EXPOSE 8080
+
+# Start the worker
+CMD ["node", "dist/worker.js"] 
