@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import ReactFlow, {
   Background,
   Controls,
@@ -8,15 +8,11 @@ import ReactFlow, {
   addEdge,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import CustomNode from './CustomNode';
-const nodeTypes = {
-  custom: CustomNode,
-};
 
 const defaultViewport = { x: 0, y: 0, zoom: 1 };
 
 export default function InfrastructureCanvas() {
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [nodes] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const onConnect = useCallback(
@@ -24,30 +20,13 @@ export default function InfrastructureCanvas() {
     [setEdges],
   );
 
-  useEffect(() => {
-    const handleDeleteNode = (event: CustomEvent<{ nodeId: string }>) => {
-      const { nodeId } = event.detail;
-      setNodes((nodes) => nodes.filter((node) => node.id !== nodeId));
-      setEdges((edges) => edges.filter(
-        (edge) => edge.source !== nodeId && edge.target !== nodeId
-      ));
-    };
-
-    window.addEventListener('deleteNode', handleDeleteNode as EventListener);
-    return () => {
-      window.removeEventListener('deleteNode', handleDeleteNode as EventListener);
-    };
-  }, [setNodes, setEdges]);
-
   return (
     <div className="w-full h-screen bg-gray-900">
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
-        nodeTypes={nodeTypes}
         defaultViewport={defaultViewport}
         fitView
         className="w-full h-full"
