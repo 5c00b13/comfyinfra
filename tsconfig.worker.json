@@ -5,7 +5,9 @@
     "module": "ESNext",
     "outDir": "dist/worker",
     "rootDir": "src/worker",
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src/worker/**/*"],
   "exclude": ["node_modules", "dist"]
