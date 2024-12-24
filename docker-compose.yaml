@@ -19,8 +19,8 @@ services:
     ports:
       - "8081:8080"
     environment:
-      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
-      - COOLIFY_API_TOKEN=${COOLIFY_API_TOKEN}
-      - COOLIFY_URL=${COOLIFY_URL}
+      - VITE_CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      - VITE_COOLIFY_API_TOKEN=${COOLIFY_API_TOKEN}
+      - VITE_COOLIFY_URL=${COOLIFY_URL}
     volumes:
       - ./src/worker:/app/src/worker 
