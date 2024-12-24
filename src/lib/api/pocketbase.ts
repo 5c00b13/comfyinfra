@@ -34,7 +34,7 @@ export async function fetchTemplates(signal?: AbortSignal): Promise<Template[]> 
     return records.map(record => ({
       id: record.id,
       name: record.name,
-      icon: record.icon,
+      icon: record.icon ? pb.files.getUrl(record, record.icon) : '',
       type: record.type
     }));
   } catch (error) {

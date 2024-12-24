@@ -1,5 +1,6 @@
-import React from 'react';
+import { useState } from 'react';
 import { cn } from '../../../lib/utils';
+import { Box } from 'lucide-react';
 
 interface ServiceButtonProps {
   label: string;
@@ -8,6 +9,8 @@ interface ServiceButtonProps {
 }
 
 export function ServiceButton({ label, iconUrl, onClick }: ServiceButtonProps) {
+  const [imageError, setImageError] = useState(false);
+
   return (
     <button
       onClick={onClick}
@@ -20,11 +23,16 @@ export function ServiceButton({ label, iconUrl, onClick }: ServiceButtonProps) {
         'group min-w-[100px]'
       )}
     >
-      <img 
-        src={iconUrl} 
-        alt={label} 
-        className="w-8 h-8 object-contain"
-      />
+      {!imageError && iconUrl ? (
+        <img 
+          src={iconUrl} 
+          alt={label}
+          onError={() => setImageError(true)}
+          className="w-8 h-8 object-contain"
+        />
+      ) : (
+        <Box className="w-8 h-8 text-gray-400" />
+      )}
       <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors whitespace-nowrap">
         {label}
       </span>
